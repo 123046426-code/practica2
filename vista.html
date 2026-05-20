@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema Restaurante</title>
+    <link rel="stylesheet" href="assets/estilos.css">
+</head>
+<body>
+
+    <h1>Sistema de Caja</h1>
+
+    <input type="text" id="producto"
+    placeholder="Producto">
+
+    <input type="number" id="precio"
+    placeholder="Precio">
+
+    <button onclick="registrarPedido()">
+        Agregar pedido
+    </button>
+
+    <h2>Pedidos</h2>
+
+    <ul id="listaPedidos"></ul>
+
+    <h3 id="total">
+        Total: $0
+    </h3>
+
+<script src="modulos/caja.js"></script>
+
+</body>
+</html>

@@ -1,38 +1,6 @@
 // Productos de ejemplo
 
-let productos = [
-
-    {
-        id: 1,
-        nombre: "Cafe Americano",
-        precio: 45
-    },
-
-    {
-        id: 2,
-        nombre: "Capuccino",
-        precio: 60
-    },
-
-    {
-        id: 3,
-        nombre: "Frappe",
-        precio: 80
-    },
-
-    {
-        id: 4,
-        nombre: "Panini",
-        precio: 70
-    },
-
-    {
-        id: 5,
-        nombre: "Pastel",
-        precio: 50
-    }
-
-];
+let productos = [];
 
 
 

@@ -1,4 +1,4 @@
-// cliente.js – Módulo Cliente (consola interactiva)
+// cliente.js - Módulo Cliente (consola interactiva)
 
 function iniciarModoCliente() {
   let nombreCliente = prompt("Bienvenido a La Cafetería. Ingresa tu nombre:");
@@ -8,7 +8,7 @@ function iniciarModoCliente() {
   do {
     opcion = prompt(
       `CLIENTE: ${nombreCliente}\n\n` +
-      "1. Ver productos\n" +
+      "1. Ver productos (consultar menú)\n" +
       "2. Hacer pedido\n" +
       "3. Ver mis pedidos\n" +
       "4. Salir"
@@ -18,12 +18,9 @@ function iniciarModoCliente() {
       case "1":
         let listaProd = "PRODUCTOS DISPONIBLES:\n\n";
         const activos = productos.filter(p => p.estado === "activo" && p.stock > 0);
-        if (activos.length === 0) {
-          alert("No hay productos disponibles en este momento.");
-        } else {
-          activos.forEach(p => {
-            listaProd += `${p.id}. ${p.nombre} - ${config.moneda}${p.precio} (${p.stock} en stock)\n`;
-          });
+        if (activos.length === 0) alert("No hay productos disponibles.");
+        else {
+          activos.forEach(p => { listaProd += `${p.id}. ${p.nombre} - ${config.moneda}${p.precio} (stock: ${p.stock})\n`; });
           alert(listaProd);
         }
         break;

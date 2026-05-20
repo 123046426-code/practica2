@@ -1,53 +1,44 @@
-// cocina.js – Módulo Cocina: CRUD de productos
+// cocina.js - Módulo Cocina: CRUD de productos
 
 function renderizarProductos() {
-  const busqueda = document.getElementById("buscar-prod").value.toLowerCase();
-  const categoria = document.getElementById("filtro-cat").value;
-
-  const filtrados = productos.filter(p => {
-    const coincideNombre = !busqueda || p.nombre.toLowerCase().includes(busqueda);
-    const coincideCat = !categoria || p.categoria === categoria;
-    return coincideNombre && coincideCat;
-  });
-
   const tbody = document.getElementById("prod-tbody");
-  if (!filtrados.length) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;">No se encontraron productos</td></tr>`;
+  if (!productos.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay productos registrados</td></tr>`;
     return;
   }
-
-  tbody.innerHTML = filtrados.map(p => `
-    <tr>
-      <td><div class="prod-nombre">${p.nombre}</div>${p.desc ? `<div class="prod-desc">${p.desc}</div>` : ""}</td>
-      <td><span class="cat-pill">${p.categoria}</span></td>
-      <td>${config.moneda}${p.precio.toFixed(2)}</td>
-      <td class="${claseStock(p.stock)}">${etiquetaStock(p.stock)}</td>
-      <td><span class="badge ${p.estado === "activo" ? "badge-activo" : "badge-inactivo"}">${p.estado === "activo" ? "Activo" : "Inactivo"}</span></td>
-      <td>
-        <button class="btn btn-sm" onclick="abrirModal(${p.id})" style="margin-right:6px;"><i class="ti ti-edit"></i> Editar</button>
-        <button class="btn btn-sm btn-danger" onclick="pedirConfirmacionEliminar(${p.id})"><i class="ti ti-trash"></i></button>
-      </td>
-    </tr>
-  `).join("");
-}
-
-function claseStock(stock) {
-  if (stock === 0) return "stock-out";
-  if (stock <= config.stockBajoEn) return "stock-low";
-  return "stock-ok";
-}
-
-function etiquetaStock(stock) {
-  if (stock === 0) return `<i class="ti ti-alert-circle"></i> Sin stock`;
-  if (stock <= config.stockBajoEn) return `<i class="ti ti-alert-triangle"></i> ${stock}`;
-  return `${stock}`;
+  tbody.innerHTML = productos.map(p => {
+    let stockClass = "";
+    let stockHtml = "";
+    if (p.stock === 0) {
+      stockClass = "stock-out";
+      stockHtml = `<i class="ti ti-alert-circle"></i> Sin stock`;
+    } else if (p.stock <= config.stockBajoEn) {
+      stockClass = "stock-low";
+      stockHtml = `<i class="ti ti-alert-triangle"></i> ${p.stock}`;
+    } else {
+      stockClass = "stock-ok";
+      stockHtml = `${p.stock}`;
+    }
+    return `
+      <tr>
+        <td><div class="prod-nombre">${p.nombre}</div>${p.desc ? `<div class="prod-desc">${p.desc}</div>` : ""}</td>
+        <td><span class="cat-pill">${p.categoria}</span></td>
+        <td>${config.moneda}${p.precio.toFixed(2)}</td>
+        <td class="${stockClass}">${stockHtml}</td>
+        <td><span class="${p.estado === "activo" ? "badge-activo" : "badge-inactivo"}">${p.estado === "activo" ? "Activo" : "Inactivo"}</span></td>
+        <td>
+          <button class="btn btn-sm" onclick="abrirModal(${p.id})" style="margin-right:6px;"><i class="ti ti-edit"></i> Editar</button>
+          <button class="btn btn-sm btn-danger" onclick="pedirConfirmacionEliminar(${p.id})"><i class="ti ti-trash"></i></button>
+        </td>
+      </tr>
+    `;
+  }).join("");
 }
 
 function abrirModal(id) {
   document.getElementById("modal-producto").classList.add("open");
   const catSelect = document.getElementById("p-cat");
   catSelect.innerHTML = config.categorias.map(cat => `<option value="${cat}">${cat}</option>`).join("");
-
   if (id !== null) {
     const p = productos.find(x => x.id === id);
     document.getElementById("modal-titulo").textContent = "Editar producto";
@@ -91,7 +82,7 @@ function guardarProducto() {
     productos[idx] = { ...productos[idx], ...datosProd };
     mostrarToast("Producto actualizado");
   } else {
-    productos.push({ id: estado.siguienteIdProducto++, ...datosProd });
+    productos.push({ id: estadoGlobal.siguienteIdProducto++, ...datosProd });
     mostrarToast("Producto agregado");
   }
   cerrarModal();
@@ -99,18 +90,18 @@ function guardarProducto() {
 }
 
 function pedirConfirmacionEliminar(id) {
-  estado.productoAEliminar = id;
+  estadoGlobal.productoAEliminar = id;
   document.getElementById("confirm-overlay").classList.add("open");
 }
 
 function cerrarConfirmacion() {
   document.getElementById("confirm-overlay").classList.remove("open");
-  estado.productoAEliminar = null;
+  estadoGlobal.productoAEliminar = null;
 }
 
 function confirmarEliminar() {
-  if (estado.productoAEliminar !== null) {
-    productos = productos.filter(p => p.id !== estado.productoAEliminar);
+  if (estadoGlobal.productoAEliminar !== null) {
+    productos = productos.filter(p => p.id !== estadoGlobal.productoAEliminar);
     mostrarToast("Producto eliminado");
     cerrarConfirmacion();
     renderizarProductos();

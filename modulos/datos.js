@@ -1,4 +1,5 @@
-// datos.js – Variables globales del sistema
+// datos.js - Variables globales y datos iniciales
+
 const config = {
   nombreSistema: "La Cafetería",
   modulo: "Sistema",
@@ -27,11 +28,9 @@ let pedidos = [
   { id: "P-004", mesa: "Mesa 1", items: ["Té Verde", "Brownie", "Granola Bar"], estado: "pendiente", hora: "10:28", notas: "Para llevar", total: 84 },
 ];
 
-const estado = {
+const estadoGlobal = {
   siguienteIdProducto: 11,
   siguienteIdPedido: 5,
-  filtroPedidos: "todos",
-  itemsSeleccionados: [],
   productoAEliminar: null,
 };
 

@@ -1,33 +1,76 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Sistema Restaurante</title>
-    <link rel="stylesheet" href="assets/estilos.css">
+
+<meta charset="UTF-8">
+
+<title>Caja</title>
+
 </head>
+
 <body>
 
-    <h1>Sistema de Caja</h1>
+<h1>Sistema Caja</h1>
 
-    <input type="text" id="producto"
-    placeholder="Producto">
+<h2>Agregar producto al pedido</h2>
 
-    <input type="number" id="precio"
-    placeholder="Precio">
+<input
+type="text"
+id="producto"
+placeholder="Producto">
 
-    <button onclick="registrarPedido()">
-        Agregar pedido
-    </button>
+<input
+type="number"
+id="precio"
+placeholder="Precio">
 
-    <h2>Pedidos</h2>
+<button
+onclick="agregarProductoPedido()">
 
-    <ul id="listaPedidos"></ul>
+Agregar producto
 
-    <h3 id="total">
-        Total: $0
-    </h3>
+</button>
+
+
+<h2>Pedido actual</h2>
+
+<ul id="pedidoActual">
+
+</ul>
+
+<h3 id="subtotal">
+
+Subtotal: $0
+
+</h3>
+
+
+<button
+onclick="generarPedido()">
+
+Confirmar pedido
+
+</button>
+
+
+<hr>
+
+<h2>Pedidos realizados</h2>
+
+<ul id="listaPedidos">
+
+</ul>
+
+<h2 id="total">
+
+Total acumulado: $0
+
+</h2>
+
 
 <script src="modulos/caja.js"></script>
 
 </body>
+
 </html>

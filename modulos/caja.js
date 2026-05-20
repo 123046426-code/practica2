@@ -1,64 +1,141 @@
-// Array de pedidos
-const listaPedidos=[];
+// Guarda todos los pedidos realizados
+const listaPedidos = [];
 
-// Total acumulado
-let totalAcumulado=0;
+// Productos agregados al pedido actual
+let pedidoActual = [];
 
-
-// Función principal
-function agregarPedido(nombreProducto,precio){
-
-    const pedido={
-        producto:nombreProducto,
-        precio:precio
-    };
-
-    listaPedidos.push(pedido);
-
-    totalAcumulado+=precio;
-}
+// Total acumulado de todos los pedidos
+let totalAcumulado = 0;
 
 
-// Función para capturar datos del HTML
-function registrarPedido(){
+// Agregar un producto al pedido actual
+function agregarProductoPedido(){
 
-    let producto=
+    let producto =
     document.getElementById("producto").value;
 
-    let precio=
+    let precio =
     Number(document.getElementById("precio").value);
-
 
     if(producto==="" || precio<=0){
 
-        alert("Ingresa datos válidos");
+        alert("Datos inválidos");
         return;
     }
 
 
-    agregarPedido(producto,precio);
+    pedidoActual.push({
 
-    actualizarVista();
+        producto: producto,
+        precio: precio
+
+    });
+
+    mostrarPedidoActual();
 }
 
 
-// Actualizar lista visual
-function actualizarVista(){
+// Crear un pedido completo
+function generarPedido(){
+
+    if(pedidoActual.length===0){
+
+        alert("No hay productos");
+        return;
+    }
+
+    let totalPedido=0;
+
+    for(let producto of pedidoActual){
+
+        totalPedido += producto.precio;
+    }
+
+
+    const pedido={
+
+        productos:[...pedidoActual],
+        total: totalPedido
+
+    };
+
+
+    listaPedidos.push(pedido);
+
+    totalAcumulado += totalPedido;
+
+    pedidoActual=[];
+
+    actualizarVistaPedidos();
+}
+    
+
+// Mostrar productos agregados antes de confirmar
+function mostrarPedidoActual(){
 
     let lista=
-    document.getElementById("listaPedidos");
+    document.getElementById(
+    "pedidoActual");
+
+    lista.innerHTML="";
+
+    let subtotal=0;
+
+    for(let producto of pedidoActual){
+
+        subtotal += producto.precio;
+
+        lista.innerHTML +=
+        `<li>
+        ${producto.producto}
+        - $${producto.precio}
+        </li>`;
+    }
+
+    document.getElementById(
+    "subtotal")
+    .innerText=
+    "Subtotal: $" + subtotal;
+
+}
+
+
+
+// Mostrar todos los pedidos generados
+function actualizarVistaPedidos(){
+
+    let lista=
+    document.getElementById(
+    "listaPedidos");
 
     lista.innerHTML="";
 
 
-    for(let pedido of listaPedidos){
+    listaPedidos.forEach(
+    (pedido,index)=>{
 
         lista.innerHTML +=
-        `<li>${pedido.producto} - $${pedido.precio}</li>`;
-    }
+        `<li>
+        Pedido ${index+1}
+        | Total: $${pedido.total}
+        </li>`;
+    });
 
 
-    document.getElementById("total")
+    document.getElementById(
+    "total")
     .innerText=
-    "Total: $" + totalAcumulado;
+    "Total acumulado: $"+
+    totalAcumulado;
+
+
+    document.getElementById(
+    "pedidoActual")
+    .innerHTML="";
+
+    document.getElementById(
+    "subtotal")
+    .innerText=
+    "Subtotal: $0";
+
 }

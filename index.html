@@ -1,84 +1,84 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>La Cafetería - Sistema Integrado</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-  <link rel="stylesheet" href="assets/styles.css">
-</head>
-<body>
+  <!DOCTYPE html>
+  <html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Cafetería - Sistema Integrado</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="assets/styles.css">
+  </head>
+  <body>
 
-<h1><i class="ti ti-coffee"></i> La Cafetería</h1>
+  <h1><i class="ti ti-coffee"></i> La Cafetería</h1>
 
-<nav>
-  <button class="nav-btn active" id="tab-pedidos" onclick="mostrarVista('pedidos')"><i class="ti ti-receipt"></i> Pedidos</button>
-  <button class="nav-btn" id="tab-productos" onclick="mostrarVista('productos')"><i class="ti ti-chef-hat"></i> Cocina</button>
-  <button class="nav-btn" onclick="iniciarModoCliente()"><i class="ti ti-user"></i> Cliente</button>
-</nav>
+  <nav>
+    <button class="nav-btn active" id="tab-pedidos" onclick="mostrarVista('pedidos')"><i class="ti ti-receipt"></i> Pedidos</button>
+    <button class="nav-btn" id="tab-productos" onclick="mostrarVista('productos')"><i class="ti ti-chef-hat"></i> Cocina</button>
+    <button class="nav-btn" onclick="iniciarModoCliente()"><i class="ti ti-user"></i> Cliente</button>
+  </nav>
 
-<!-- Vista Pedidos (Caja) -->
-<div id="view-pedidos" class="view active">
-  <div id="lista-pedidos"></div>
-  <div id="total-acumulado-caja" class="total-box">Total acumulado: $0.00</div>
-</div>
-
-<!-- Vista Productos (Cocina) -->
-<div id="view-productos" class="view">
-  <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
-    <button class="btn" onclick="abrirModal(null)"><i class="ti ti-plus"></i> Agregar producto</button>
+  <!-- Vista Pedidos (Caja) -->
+  <div id="view-pedidos" class="view active">
+    <div id="lista-pedidos"></div>
+    <div id="total-acumulado-caja" class="total-box">Total acumulado: $0.00</div>
   </div>
-  <table>
-    <thead>
-      <tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Estado</th><th>Acciones</th></tr>
-    </thead>
-    <tbody id="prod-tbody"></tbody>
-  </table>
-</div>
 
-<!-- Modal producto -->
-<div id="modal-producto" class="modal-overlay">
-  <div class="modal">
-    <h2 id="modal-titulo">Agregar producto</h2>
-    <input type="hidden" id="edit-id">
-    <div class="form-group"><label>Nombre</label><input type="text" id="p-nombre"></div>
-    <div class="form-group"><label>Categoría</label><select id="p-cat"></select></div>
-    <div class="form-group"><label>Precio</label><input type="number" id="p-precio" step="0.01"></div>
-    <div class="form-group"><label>Stock</label><input type="number" id="p-stock"></div>
-    <div class="form-group"><label>Descripción</label><input type="text" id="p-desc"></div>
-    <div class="form-group"><label>Estado</label><select id="p-estado"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select></div>
-    <div class="form-actions">
-      <button class="btn btn-danger" onclick="cerrarModal()">Cancelar</button>
-      <button class="btn" onclick="guardarProducto()">Guardar</button>
+  <!-- Vista Productos (Cocina) -->
+  <div id="view-productos" class="view">
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+      <button class="btn" onclick="abrirModal(null)"><i class="ti ti-plus"></i> Agregar producto</button>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Estado</th><th>Acciones</th></tr>
+      </thead>
+      <tbody id="prod-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- Modal producto -->
+  <div id="modal-producto" class="modal-overlay">
+    <div class="modal">
+      <h2 id="modal-titulo">Agregar producto</h2>
+      <input type="hidden" id="edit-id">
+      <div class="form-group"><label>Nombre</label><input type="text" id="p-nombre"></div>
+      <div class="form-group"><label>Categoría</label><select id="p-cat"></select></div>
+      <div class="form-group"><label>Precio</label><input type="number" id="p-precio" step="0.01"></div>
+      <div class="form-group"><label>Stock</label><input type="number" id="p-stock"></div>
+      <div class="form-group"><label>Descripción</label><input type="text" id="p-desc"></div>
+      <div class="form-group"><label>Estado</label><select id="p-estado"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select></div>
+      <div class="form-actions">
+        <button class="btn btn-danger" onclick="cerrarModal()">Cancelar</button>
+        <button class="btn" onclick="guardarProducto()">Guardar</button>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Confirmación eliminar -->
-<div id="confirm-overlay" class="confirm-overlay">
-  <div class="confirm-box">
-    <p>¿Eliminar este producto permanentemente?</p>
-    <div style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: center;">
-      <button class="btn" onclick="cerrarConfirmacion()">Cancelar</button>
-      <button class="btn btn-danger" onclick="confirmarEliminar()">Eliminar</button>
+  <!-- Confirmación eliminar -->
+  <div id="confirm-overlay" class="confirm-overlay">
+    <div class="confirm-box">
+      <p>¿Eliminar este producto permanentemente?</p>
+      <div style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: center;">
+        <button class="btn" onclick="cerrarConfirmacion()">Cancelar</button>
+        <button class="btn btn-danger" onclick="confirmarEliminar()">Eliminar</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div id="toast" class="toast"></div>
+  <div id="toast" class="toast"></div>
 
-<!-- Carga de módulos en orden -->
-<script src="modulos/datos.js"></script>
-<script src="modulos/cocina.js"></script>
-<script src="modulos/caja.js"></script>
-<script src="modulos/cliente.js"></script>
+  <!-- Carga de módulos en orden -->
+  <script src="modulos/datos.js"></script>
+  <script src="modulos/cocina.js"></script>
+  <script src="modulos/caja.js"></script>
+  <script src="modulos/cliente.js"></script>
 
-<script>
-  (function() {
-    mostrarVista("pedidos");
-    renderizarProductos();  // para tener la tabla cargada desde el inicio
-    // llenar categorías en modal (se ejecuta cada vez que se abre)
-  })();
-</script>
-</body>
-</html>
+  <script>
+    (function() {
+      mostrarVista("pedidos");
+      renderizarProductos();  // para tener la tabla cargada desde el inicio
+      // llenar categorías en modal (se ejecuta cada vez que se abre)
+    })();
+  </script>
+  </body>
+  </html>

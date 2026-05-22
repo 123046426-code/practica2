@@ -1,99 +1,159 @@
-function mostrarVista(vista) {
-  document.querySelectorAll(".view").forEach(el => el.classList.remove("active"));
-  document.querySelectorAll(".nav-btn").forEach(el => el.classList.remove("active"));
-  document.getElementById("view-" + vista).classList.add("active");
-  document.getElementById("tab-" + vista)?.classList.add("active");
-  if (vista === "pedidos") {
-    renderizarPedidos();
-    actualizarTotalCaja();
-  }
-  if (vista === "productos") renderizarProductos();
+// INVESTIGACIÓN: console.log, funciones, template strings, forEach()
+
+let pedidos = [];
+let totalAcumulado = 0;
+
+export function inicializarCaja(pedidosGlobal) {
+    pedidos = pedidosGlobal;
+    console.log("Modulo Caja inicializado");
 }
 
-function actualizarTotalCaja() {
-  totalAcumuladoCaja = pedidos.reduce((sum, { total }) => sum + total, 0);
-  document.getElementById("total-acumulado-caja").innerHTML = 
-    `Total acumulado (con IVA): ${config.moneda}${totalAcumuladoCaja.toFixed(2)}`;
+// INVESTIGACIÓN: funciones
+export function verPedidosPendientes() {
+    console.log("\n====== PEDIDOS PENDIENTES ======\n");
+    
+    if(pedidos.length === 0) {
+        console.log("No hay pedidos pendientes");
+        return;
+    }
+    
+    // INVESTIGACIÓN: forEach()
+    pedidos.forEach(pedido => {
+        // INVESTIGACIÓN: template strings
+        console.log(`ID: ${pedido.id}`);
+        console.log(`   Mesa: ${pedido.mesa}`);
+        console.log(`   Items: ${pedido.items.join(" · ")}`);
+        console.log(`   Estado: ${pedido.estado}`);
+        console.log(`   Subtotal: $${pedido.subtotal.toFixed(2)}`);
+        console.log(`   IVA: $${pedido.iva.toFixed(2)}`);
+        console.log(`   Total: $${pedido.total.toFixed(2)}`);
+        console.log("");
+    });
 }
 
-function agregarPedido(mesa, items, notas = "") {
-  if (!mesa || !items.length) return false;
-
-const subtotal = items.reduce((sum, nombreItem) => {
-    const prod = productos.find(p => p.nombre === nombreItem && p.estado === "activo");
-    return sum + (prod ? prod.precio : 0);
-  }, 0);
-
-  const iva = subtotal * config.ivaTasa;
-  const total = subtotal + iva;
-
-  const ahora = new Date();
-  const hora = `${ahora.getHours()}:${String(ahora.getMinutes()).padStart(2, "0")}`;
-
-const nuevoPedido = {
-    id: `P-00${estadoGlobal.siguienteIdPedido++}`,
-    mesa: mesa,
-    items: [...items],
-    estado: "pendiente",
-    hora: hora,
-    notas: notas,
-    subtotal: subtotal,
-    iva: iva,
-    total: total
-  };
-  
-  pedidos.unshift(nuevoPedido);
-  actualizarTotalCaja();
-  if (document.getElementById("view-pedidos").classList.contains("active")) renderizarPedidos();
-  mostrarToast(`Pedido creado para ${mesa}`);
-  return true;
+// INVESTIGACIÓN: funciones
+export function verPedidosPorEstado(estado) {
+    console.log(`\n====== PEDIDOS ${estado.toUpperCase()} ======\n`);
+    
+    const filtrados = pedidos.filter(p => p.estado === estado);
+    
+    if(filtrados.length === 0) {
+        console.log(`No hay pedidos en estado: ${estado}`);
+        return;
+    }
+    
+    filtrados.forEach(pedido => {
+        console.log(`${pedido.id} - Mesa ${pedido.mesa} - Total: $${pedido.total.toFixed(2)}`);
+    });
 }
 
-function renderizarPedidos() {
-  const contenedor = document.getElementById("lista-pedidos");
-  if (!pedidos.length) {
-    contenedor.innerHTML = `<div class="empty-state"><i class="ti ti-clipboard-off"></i><p>No hay pedidos</p></div>`;
-    return;
-  }
-  
-  contenedor.innerHTML = pedidos.map(p => {
-    const info = estadosPedido[p.estado];
-    // Usamos destructuring para extraer subtotal, iva, total
-    const { subtotal, iva, total } = p;
-    return `
-      <div class="card order-card ${p.estado}">
-        <div class="order-header">
-          <span class="order-num"><i class="ti ti-receipt"></i> ${p.id} — ${p.mesa}</span>
-          <span class="badge ${info.clase}">${info.etiqueta}</span>
-        </div>
-        <div class="order-meta"><i class="ti ti-clock"></i> ${p.hora} ${p.notas ? `· ${p.notas}` : ""}</div>
-        <div class="order-items">${p.items.join(" · ")}</div>
-        <div style="margin: 0.5rem 0; border-top: 1px solid #eee; padding-top: 0.5rem;">
-          <div><strong>Subtotal:</strong> ${config.moneda}${subtotal.toFixed(2)}</div>
-          <div><strong>IVA (${(config.ivaTasa * 100)}%):</strong> ${config.moneda}${iva.toFixed(2)}</div>
-          <div><strong>Total:</strong> ${config.moneda}${total.toFixed(2)}</div>
-        </div>
-        <div class="order-actions">
-          ${p.estado === "pendiente" ? `<button class="btn btn-sm" onclick="cambiarEstadoPedido('${p.id}', 'en-preparacion')"><i class="ti ti-chef-hat"></i> Preparar</button>` : ""}
-          ${p.estado === "en-preparacion" ? `<button class="btn btn-accent btn-sm" onclick="cambiarEstadoPedido('${p.id}', 'listo')"><i class="ti ti-check"></i> Marcar listo</button>` : ""}
-          ${(p.estado !== "cancelado" && p.estado !== "listo") ? `<button class="btn btn-danger btn-sm" onclick="cambiarEstadoPedido('${p.id}', 'cancelado')"><i class="ti ti-x"></i> Cancelar</button>` : ""}
-        </div>
-      </div>`;
-  }).join("");
+// INVESTIGACIÓN: funciones
+export function cambiarEstadoPedido(id, nuevoEstado) {
+    console.log(`Cambiando estado del pedido ${id} a ${nuevoEstado}`);
+    
+    let pedidoEncontrado = null;
+    for(let i = 0; i < pedidos.length; i++) {
+        if(pedidos[i].id === id) {
+            pedidoEncontrado = pedidos[i];
+            break;
+        }
+    }
+    
+    if(pedidoEncontrado) {
+        pedidoEncontrado.estado = nuevoEstado;
+        console.log(`Pedido ${id}: ${nuevoEstado}`);
+        return true;
+    } else {
+        console.log(`Pedido ${id} no encontrado`);
+        return false;
+    }
 }
 
-function cambiarEstadoPedido(id, nuevoEstado) {
-  const pedido = pedidos.find(p => p.id === id);
-  if (pedido) {
-    pedido.estado = nuevoEstado;
-    renderizarPedidos();
-    mostrarToast(`Pedido ${id}: ${estadosPedido[nuevoEstado].etiqueta}`);
-  }
+// INVESTIGACIÓN: funciones
+export function calcularTotalAcumulado() {
+    totalAcumulado = 0;
+    
+    // INVESTIGACIÓN: forEach()
+    pedidos.forEach(pedido => {
+        if(pedido.estado === "listo" || pedido.estado === "entregado") {
+            totalAcumulado += pedido.total;
+        }
+    });
+    
+    return totalAcumulado;
 }
 
-function mostrarToast(mensaje) {
-  const toast = document.getElementById("toast");
-  toast.textContent = mensaje;
-  toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 2400);
+// INVESTIGACIÓN: funciones
+export function mostrarResumenCaja() {
+    console.log("\n====== RESUMEN CAJA ======\n");
+    
+    const total = calcularTotalAcumulado();
+    
+    let pedidosPendientes = 0;
+    let pedidosPreparacion = 0;
+    let pedidosListos = 0;
+    let pedidosCancelados = 0;
+    
+    // INVESTIGACIÓN: forEach()
+    pedidos.forEach(pedido => {
+        switch(pedido.estado) {
+            case "pendiente": pedidosPendientes++; break;
+            case "en-preparacion": pedidosPreparacion++; break;
+            case "listo": pedidosListos++; break;
+            case "cancelado": pedidosCancelados++; break;
+        }
+    });
+    
+    // INVESTIGACIÓN: template strings
+    console.log(`Estadisticas:`);
+    console.log(`   Pendientes: ${pedidosPendientes}`);
+    console.log(`   En preparacion: ${pedidosPreparacion}`);
+    console.log(`   Listos: ${pedidosListos}`);
+    console.log(`   Cancelados: ${pedidosCancelados}`);
+    console.log(`\nTotal acumulado cobrado: $${total.toFixed(2)}`);
+}
+
+// INVESTIGACIÓN: funciones
+export function mostrarMenu() {
+    console.log("\n====== CAJA ======");
+    console.log("1. Ver pedidos pendientes");
+    console.log("2. Ver pedidos en preparacion");
+    console.log("3. Ver pedidos listos");
+    console.log("4. Cambiar estado de pedido");
+    console.log("5. Ver resumen de caja");
+    console.log("6. Salir");
+}
+
+// Funciones auxiliares
+export function getPedidos() {
+    return pedidos;
+}
+
+export function agregarPedidoEjemplo() {
+    // Datos de ejemplo para probar
+    pedidos.push({
+        id: `P-001`,
+        mesa: "Mesa 1",
+        items: ["Cafe Americano", "Panini"],
+        estado: "pendiente",
+        hora: "10:30",
+        notas: "Sin azucar",
+        subtotal: 115,
+        iva: 18.40,
+        total: 133.40
+    });
+    
+    pedidos.push({
+        id: `P-002`,
+        mesa: "Mesa 2",
+        items: ["Capuccino"],
+        estado: "en-preparacion",
+        hora: "10:45",
+        notas: "",
+        subtotal: 60,
+        iva: 9.60,
+        total: 69.60
+    });
+    
+    console.log("Pedidos de ejemplo agregados a Caja");
 }

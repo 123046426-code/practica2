@@ -47,7 +47,7 @@ let productosCocina = [
 ];
 
 export function inicializarCocina(productosGlobal) {
-    productosCocina = productosGlobal;
+    productosCocina.push(...productosGlobal);   //productosCocina = productosGlobal;
     console.log("Modulo Cocina inicializado");
 }
 

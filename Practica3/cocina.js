@@ -1,4 +1,5 @@
 ///////modulo de cocina
+//// igual que los otros se ejecuta con node cocina.js
 
 const readline = require("readline");
 const productos = [

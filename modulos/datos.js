@@ -1,44 +1,222 @@
-// datos.js - Variables globales y datos iniciales
+// cocina.js - Módulo Cocina: CRUD de productos
 
-const config = {
-  nombreSistema: "La Cafetería",
-  modulo: "Sistema",
-  moneda: "$",
-  stockBajoEn: 5,
-  categorias: ["Bebidas", "Alimentos", "Postres", "Snacks"],
-};
+function renderizarProductos() {
+  const tbody = document.getElementById("prod-tbody");
+  if (!productos.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay productos registrados</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = productos.map(p => {
+    let stockClass = "";
+    let stockHtml = "";
+    if (p.stock === 0) {
+      stockClass = "stock-out";
+      stockHtml = `<i class="ti ti-alert-circle"></i> Sin stock`;
+    } else if (p.stock <= config.stockBajoEn) {
+      stockClass = "stock-low";
+      stockHtml = `<i class="ti ti-alert-triangle"></i> ${p.stock}`;
+    } else {
+      stockClass = "stock-ok";
+      stockHtml = `${p.stock}`;
+    }
+    return `
+      <tr>
+        <td><div class="prod-nombre">${p.nombre}</div>${p.desc ? `<div class="prod-desc">${p.desc}</div>` : ""}</td>
+        <td><span class="cat-pill">${p.categoria}</span></td>
+        <td>${config.moneda}${p.precio.toFixed(2)}</td>
+        <td class="${stockClass}">${stockHtml}</td>
+        <td><span class="${p.estado === "activo" ? "badge-activo" : "badge-inactivo"}">${p.estado === "activo" ? "Activo" : "Inactivo"}</span></td>
+        <td>
+          <button class="btn btn-sm" onclick="abrirModal(${p.id})" style="margin-right:6px;"><i class="ti ti-edit"></i> Editar</button>
+          <button class="btn btn-sm btn-danger" onclick="pedirConfirmacionEliminar(${p.id})"><i class="ti ti-trash"></i></button>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
 
-let productos = [
-  { id: 1, nombre: "Café Americano", categoria: "Bebidas", precio: 35, stock: 50, estado: "activo", desc: "Café negro sin leche" },
-  { id: 2, nombre: "Cappuccino", categoria: "Bebidas", precio: 45, stock: 40, estado: "activo", desc: "Espresso con leche vaporizada" },
-  { id: 3, nombre: "Latte", categoria: "Bebidas", precio: 48, stock: 35, estado: "activo", desc: "" },
-  { id: 4, nombre: "Té Verde", categoria: "Bebidas", precio: 30, stock: 5, estado: "activo", desc: "" },
-  { id: 5, nombre: "Chocolate Caliente", categoria: "Bebidas", precio: 42, stock: 0, estado: "inactivo", desc: "" },
-  { id: 6, nombre: "Croissant", categoria: "Alimentos", precio: 28, stock: 15, estado: "activo", desc: "Recién horneado" },
-  { id: 7, nombre: "Bagel con queso", categoria: "Alimentos", precio: 38, stock: 10, estado: "activo", desc: "" },
-  { id: 8, nombre: "Cheesecake", categoria: "Postres", precio: 55, stock: 8, estado: "activo", desc: "De zarzamora" },
-  { id: 9, nombre: "Brownie", categoria: "Postres", precio: 32, stock: 3, estado: "activo", desc: "" },
-  { id: 10, nombre: "Granola Bar", categoria: "Snacks", precio: 22, stock: 20, estado: "activo", desc: "" },
-];
+function abrirModal(id) {
+  document.getElementById("modal-producto")
+    .classList.add("open");
+  const catSelect = document.getElementById("p-cat");
+  catSelect.innerHTML = config.categorias.map(cat =>
+    `<option value="${cat}">${cat}</option>`
+  ).join("");
 
-let pedidos = [
-  { id: "P-001", mesa: "Mesa 2", items: ["Café Americano", "Croissant"], estado: "en-preparacion", hora: "10:15", notas: "", total: 63 },
-  { id: "P-002", mesa: "Mesa 5", items: ["Latte", "Cheesecake"], estado: "pendiente", hora: "10:22", notas: "Sin azúcar", total: 103 },
-  { id: "P-003", mesa: "Juan R.", items: ["Cappuccino"], estado: "listo", hora: "10:05", notas: "", total: 45 },
-  { id: "P-004", mesa: "Mesa 1", items: ["Té Verde", "Brownie", "Granola Bar"], estado: "pendiente", hora: "10:28", notas: "Para llevar", total: 84 },
-];
 
-const estadoGlobal = {
-  siguienteIdProducto: 11,
-  siguienteIdPedido: 5,
-  productoAEliminar: null,
-};
+  if (id !== null) {
 
-let totalAcumuladoCaja = pedidos.reduce((sum, p) => sum + (p.total || 0), 0);
+    const p = productos.find(x => x.id === id);
 
-const estadosPedido = {
-  pendiente: { etiqueta: "Pendiente", clase: "badge-pendiente" },
-  "en-preparacion": { etiqueta: "En preparación", clase: "badge-prep" },
-  listo: { etiqueta: "Listo", clase: "badge-listo" },
-  cancelado: { etiqueta: "Cancelado", clase: "badge-cancel" },
-};
+    document.getElementById("modal-titulo")
+      .textContent = "Editar producto";
+    document.getElementById("edit-id").value = p.id;
+    document.getElementById("p-nombre").value = p.nombre;
+    document.getElementById("p-cat").value = p.categoria;
+    document.getElementById("p-precio").value = p.precio;
+    document.getElementById("p-stock").value = p.stock;
+    document.getElementById("p-desc").value = p.desc;
+    document.getElementById("p-estado").value = p.estado;
+  } else {
+
+    document.getElementById("modal-titulo")
+      .textContent = "Agregar producto";
+    document.getElementById("edit-id").value = "";
+    ["p-nombre", "p-precio", "p-stock", "p-desc"]
+      .forEach(campo =>
+        document.getElementById(campo).value = ""
+      );
+    document.getElementById("p-cat").value =
+      config.categorias[0];
+    document.getElementById("p-estado").value =
+      "activo";
+  }
+}
+function cerrarModal() {
+
+  document.getElementById("modal-producto")
+    .classList.remove("open");
+}
+
+function guardarProducto() {
+  const nombre =
+    document.getElementById("p-nombre")
+      .value.trim();
+  const precio =
+    parseFloat(
+      document.getElementById("p-precio").value
+    );
+  const stock =
+    parseInt(
+      document.getElementById("p-stock").value
+    );
+
+  if (!nombre || isNaN(precio) || isNaN(stock)) {
+    mostrarToast("Completa todos los campos requeridos");
+    return;
+  }
+
+
+  const datosProd = {
+    nombre,
+    precio,
+    stock,
+    categoria:
+      document.getElementById("p-cat").value,
+    desc:
+      document.getElementById("p-desc")
+        .value.trim(),
+    estado:
+      document.getElementById("p-estado").value,
+  };
+
+
+  const idEdicion =
+    document.getElementById("edit-id").value;
+  if (idEdicion) {
+    const idx = productos.findIndex(
+      p => p.id == idEdicion
+    );
+    productos[idx] = {
+      ...productos[idx],
+      ...datosProd
+    };
+
+    mostrarToast("Producto actualizado");
+  } else {
+    productos.push({
+      id: estadoGlobal.siguienteIdProducto++,
+      ...datosProd
+    });
+
+    mostrarToast("Producto agregado");
+  }
+  cerrarModal();
+  renderizarProductos();
+}
+function pedirConfirmacionEliminar(id) {
+  estadoGlobal.productoAEliminar = id;
+  document.getElementById("confirm-overlay")
+    .classList.add("open");
+}
+
+function cerrarConfirmacion() {
+  document.getElementById("confirm-overlay")
+    .classList.remove("open");
+  estadoGlobal.productoAEliminar = null;
+}
+
+
+function confirmarEliminar() {
+  if (estadoGlobal.productoAEliminar !== null) {
+
+    productos = productos.filter(
+      p => p.id !== estadoGlobal.productoAEliminar
+    );
+    mostrarToast("Producto eliminado");
+    cerrarConfirmacion();
+    renderizarProductos();
+  }
+}
+
+
+// funciones agregadas
+function productosBaratos() {
+
+  const baratos = productos.filter(p =>
+    p.precio <= 100
+  );
+
+  renderizarProductos(baratos);
+}
+
+function productosCaros() {
+
+  const caros = productos.filter(p =>
+    p.precio > 100
+  );
+
+  renderizarProductos(caros);
+}
+
+function mostrarBebidas() {
+
+  const bebidas = productos.filter(p =>
+    p.categoria.toLowerCase() === "bebidas"
+  );
+
+  renderizarProductos(bebidas);
+}
+
+
+function mostrarPostres() {
+
+  const postres = productos.filter(p =>
+    p.categoria.toLowerCase() === "postres"
+  );
+
+  renderizarProductos(postres);
+}
+
+
+function buscarProducto(nombreBuscado) {
+
+  const producto = productos.find(p =>
+    p.nombre.toLowerCase() === nombreBuscado.toLowerCase()
+  );
+
+
+  if (producto) {
+
+    renderizarProductos([producto]);
+
+  } else {
+
+    alert("Producto no encontrado");
+  }
+}
+
+function mostrarTodos() {
+
+  renderizarProductos(productos);
+}

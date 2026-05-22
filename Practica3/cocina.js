@@ -43,11 +43,20 @@ let productosCocina = [
         estado: "activo",
         stock: 3,
         promocion: false
+    },
+    {
+        id: 6,
+        nombre: "pan de azucar",
+        precio: 10,
+        categoria: "postre",
+        estado: "activo",
+        stock: 19,
+        promocion: false
     }
 ];
 
 export function inicializarCocina(productosGlobal) {
-    productosCocina.push(...productosGlobal);   //productosCocina = productosGlobal;
+    productosCocina = productosGlobal;
     console.log("Modulo Cocina inicializado");
 }
 

@@ -1,3 +1,4 @@
+import { prepararPedido } from "./cocina.js";
 let productosCliente = [];
 let pedidosCliente = [];
 
@@ -9,27 +10,27 @@ export function inicializarCliente(productosGlobal, pedidosGlobal) {
 
 export function verProductosCliente() {
     console.log("Mostrando productos");
-    
+
     let disponibles = [];
-    
-    for(let i = 0; i < productosCliente.length; i++) {
-        if(productosCliente[i].stock > 0 && productosCliente[i].estado === "activo") {
+
+    for (let i = 0; i < productosCliente.length; i++) {
+        if (productosCliente[i].stock > 0 && productosCliente[i].estado === "activo") {
             disponibles.push(productosCliente[i]);
         }
     }
-    
-    if(disponibles.length === 0) {
+
+    if (disponibles.length === 0) {
         console.log("No hay productos disponibles");
         return;
     }
-    
+
     console.log("\n====== PRODUCTOS ======\n");
-    
+
     const lista = disponibles.map(producto => {
         let promo = producto.promocion ? "PROMO" : "";
         return `${producto.id}. ${producto.nombre} - $${producto.precio} (Stock: ${producto.stock}) ${promo}`;
     });
-    
+
     lista.forEach(linea => {
         console.log(linea);
     });
@@ -37,11 +38,11 @@ export function verProductosCliente() {
 
 export function verPromocionesCliente() {
     console.log("Mostrando promociones");
-    
+
     let promociones = [];
-    
-    for(let i = 0; i < productosCliente.length; i++) {
-        if(
+
+    for (let i = 0; i < productosCliente.length; i++) {
+        if (
             productosCliente[i].promocion === true &&
             productosCliente[i].stock > 0 &&
             productosCliente[i].estado === "activo"
@@ -49,77 +50,142 @@ export function verPromocionesCliente() {
             promociones.push(productosCliente[i]);
         }
     }
-    
-    if(promociones.length === 0) {
+
+    if (promociones.length === 0) {
         console.log("No hay promociones disponibles");
         return;
     }
-    
+
     console.log("\n====== PROMOCIONES ======\n");
-    
+
     promociones.forEach(producto => {
         console.log(`${producto.id}. ${producto.nombre} - $${producto.precio}`);
     });
 }
 
-export function hacerPedidoCliente(idProducto) {
+export async function hacerPedidoCliente(idProducto) {
+
     const idNumerico = parseInt(idProducto);
-    
-    console.log(`Haciendo pedido del producto ID: ${idNumerico}`);
-    
+
+    console.log(
+        `\n🛒 Cliente realizando pedido...`
+    );
+
     let productoEncontrado = null;
-    let indexProducto = -1;
-    
-    for(let i = 0; i < productosCliente.length; i++) {
-        if(
+
+    for (let i = 0; i < productosCliente.length; i++) {
+
+        if (
             productosCliente[i].id === idNumerico &&
             productosCliente[i].stock > 0 &&
             productosCliente[i].estado === "activo"
         ) {
-            productoEncontrado = productosCliente[i];
-            indexProducto = i;
+
+            productoEncontrado =
+                productosCliente[i];
+
             break;
         }
     }
-    
-    if(productoEncontrado !== null) {
+
+    // PRODUCTO NO EXISTE
+    if (productoEncontrado === null) {
+
+        console.log(
+            " Producto no disponible"
+        );
+
+        return false;
+    }
+
+    try {
+
+        // ENVIAR A COCINA
+        const respuestaCocina =
+            await prepararPedido(
+                productoEncontrado.nombre
+            );
+
+        console.log(
+            "\n====== COCINA ======"
+        );
+
+        console.log(respuestaCocina);
+
+        // GENERAR PEDIDO
         const ahora = new Date();
-        const hora = `${ahora.getHours()}:${String(ahora.getMinutes()).padStart(2, "0")}`;
-        
+
+        const hora =
+            `${ahora.getHours()}:` +
+            `${String(
+                ahora.getMinutes()
+            ).padStart(2, "0")}`;
+
         const nuevoPedido = {
+
             id: pedidosCliente.length + 1,
+
             mesa: "Cliente",
-            items: [productoEncontrado.nombre],
-            estado: "pendiente",
+
+            items: [
+                productoEncontrado.nombre
+            ],
+
+            estado: "preparado",
+
             hora: hora,
+
             notas: "",
-            subtotal: productoEncontrado.precio,
-            iva: productoEncontrado.precio * 0.16,
-            total: productoEncontrado.precio * 1.16
+
+            subtotal:
+                productoEncontrado.precio,
+
+            iva:
+                productoEncontrado.precio * 0.16,
+
+            total:
+                productoEncontrado.precio * 1.16
         };
-        
+
         pedidosCliente.push(nuevoPedido);
-        productosCliente[indexProducto].stock--;
-        console.log(`${productoEncontrado.nombre} agregado al pedido`);
-        console.log(`Pedido #${nuevoPedido.id} - Total: $${nuevoPedido.total.toFixed(2)}`);
+
+        // NOTIFICACION
+        console.log(
+            "\n====== CLIENTE ======"
+        );
+
+        console.log(
+            ` Pedido #${nuevoPedido.id} listo`
+        );
+
+        console.log(
+            `Total: $${nuevoPedido.total.toFixed(2)}`
+        );
+
         return true;
-    } else {
-        console.log("Producto no disponible");
+
+    } catch (error) {
+
+        console.log(
+            "\n====== ERROR ======"
+        );
+
+        console.log(error);
+
         return false;
     }
 }
-
 export function verPedidosCliente() {
     console.log("Mostrando pedidos");
-    
-    if(pedidosCliente.length === 0) {
+
+    if (pedidosCliente.length === 0) {
         console.log("No hay pedidos registrados");
         return;
     }
-    
+
     console.log("\n====== MIS PEDIDOS ======\n");
-    
-    for(let i = 0; i < pedidosCliente.length; i++) {
+
+    for (let i = 0; i < pedidosCliente.length; i++) {
         const pedido = pedidosCliente[i];
         console.log(`Pedido #${pedido.id} - ${pedido.hora}`);
         console.log(`Items: ${pedido.items.join(", ")}`);

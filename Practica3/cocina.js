@@ -1,98 +1,73 @@
-let productosCocina = [
-    {
-        id: 1,
-        nombre: "Cafe Americano",
-        precio: 35,
-        categoria: "bebida",
-        estado: "activo",
-        stock: 10,
-        promocion: false
-    },
-    {
-        id: 2,
-        nombre: "Cappuccino",
-        precio: 55,
-        categoria: "bebida",
-        estado: "activo",
-        stock: 8,
-        promocion: true
-    },
-    {
-        id: 3,
-        nombre: "Te Verde",
-        precio: 30,
-        categoria: "bebida",
-        estado: "activo",
-        stock: 15,
-        promocion: false
-    },
-    {
-        id: 4,
-        nombre: "Brownie",
-        precio: 45,
-        categoria: "postre",
-        estado: "activo",
-        stock: 5,
-        promocion: true
-    },
-    {
-        id: 5,
-        nombre: "Sandwich Club",
-        precio: 120,
-        categoria: "comida",
-        estado: "activo",
-        stock: 3,
-        promocion: false
-    }
-];
+let productosCocina = [];
+
 
 export function inicializarCocina(productosGlobal) {
-    productosCocina.push(...productosGlobal);   //productosCocina = productosGlobal;
-    console.log("Modulo Cocina inicializado");
+
+    productosCocina = productosGlobal;
+
+    console.log(" Modulo Cocina inicializado");
 }
 
+
+
 export function productosBaratosCocina() {
+
     return productosCocina.filter(
         p => p.precio < 50 && p.estado === "activo"
     );
 }
 
 export function productosCarosCocina() {
+
     return productosCocina.filter(
         p => p.precio >= 100 && p.estado === "activo"
     );
 }
 
 export function bebidasCocina() {
+
     return productosCocina.filter(
-        p => p.categoria === "bebida" && p.estado === "activo"
+        p => p.categoria === "bebida" &&
+            p.estado === "activo"
     );
 }
 
 export function postresCocina() {
+
     return productosCocina.filter(
-        p => p.categoria === "postre" && p.estado === "activo"
+        p => p.categoria === "postre" &&
+            p.estado === "activo"
     );
 }
 
+
+
 export function buscarNombreCocina(nombre) {
+
     return productosCocina.find(
         p => p.nombre.toLowerCase() === nombre.toLowerCase()
     );
 }
 
 export function buscarIdCocina(id) {
+
     return productosCocina.find(
         p => p.id === id
     );
 }
 
+
+
 function mostrarCocina(lista) {
-    if(lista.length === 0) {
-        console.log("No se encontraron productos");
+
+    if (lista.length === 0) {
+
+        console.log("❌ No se encontraron productos");
         return;
     }
+
     lista.forEach(p => {
+
         console.log(
             `${p.nombre} - $${p.precio} [${p.categoria}]`
         );
@@ -133,55 +108,204 @@ export function verPostresCocina() {
     console.log("\n====== POSTRES ======\n");
     mostrarCocina(postresCocina());
 }
+export function listarProductosCocina() {
 
-export function agregarProductoCocina(nombre, precio, categoria, stock, promocion) {
-    const nuevosIds = productosCocina.map(p => p.id);
-    const maxId = Math.max(...nuevosIds, 0);
-    const nuevoId = maxId + 1;
-    
-    const nuevoProducto = {
-        id: nuevoId,
-        nombre: nombre,
-        precio: precio,
-        categoria: categoria,
-        estado: "activo",
-        stock: stock,
-        promocion: promocion
-    };
-    productosCocina.push(nuevoProducto);
-    console.log(`Producto "${nombre}" agregado con ID ${nuevoId}`);
-    return nuevoProducto;
+    console.log("\n====== PRODUCTOS ACTIVOS ======\n");
+
+    const activos = productosCocina.filter(
+        p => p.estado === "activo"
+    );
+
+    mostrarCocina(activos);
+
+    return activos;
 }
+
+
+
+export function agregarProductoCocina(
+    nombre,
+    precio,
+    categoria,
+    stock,
+    promocion
+) {
+
+    return new Promise((resolve, reject) => {
+
+        console.log("\n Registrando producto...");
+
+        setTimeout(() => {
+
+            if (!nombre || precio <= 0) {
+
+                reject(" Datos inválidos");
+                return;
+            }
+
+            const nuevosIds = productosCocina.map(
+                p => p.id
+            );
+
+            const maxId = Math.max(...nuevosIds, 0);
+
+            const nuevoProducto = {
+
+                id: maxId + 1,
+                nombre,
+                precio,
+                categoria,
+                estado: "activo",
+                stock,
+                promocion
+            };
+
+            productosCocina.push(nuevoProducto);
+
+            resolve(
+                ` Producto "${nombre}" agregado correctamente`
+            );
+
+        }, 2000);
+
+    });
+}
+
 
 export function editarProductoCocina(id, nuevosDatos) {
-    const producto = buscarIdCocina(id);
-    if (!producto) {
-        console.log(`Producto con ID ${id} no encontrado`);
-        return null;
-    }
-    if (nuevosDatos.nombre) producto.nombre = nuevosDatos.nombre;
-    if (nuevosDatos.precio) producto.precio = nuevosDatos.precio;
-    if (nuevosDatos.categoria) producto.categoria = nuevosDatos.categoria;
-    if (nuevosDatos.stock !== undefined) producto.stock = nuevosDatos.stock;
-    if (nuevosDatos.promocion !== undefined) producto.promocion = nuevosDatos.promocion;
-    console.log(`Producto ${id} actualizado`);
-    return producto;
+
+    return new Promise((resolve, reject) => {
+
+        console.log("\n Actualizando producto...");
+
+        setTimeout(() => {
+
+            const producto = buscarIdCocina(id);
+
+            if (!producto) {
+
+                reject(" Producto no encontrado");
+                return;
+            }
+
+            if (nuevosDatos.nombre)
+                producto.nombre = nuevosDatos.nombre;
+
+            if (nuevosDatos.precio)
+                producto.precio = nuevosDatos.precio;
+
+            if (nuevosDatos.categoria)
+                producto.categoria = nuevosDatos.categoria;
+
+            if (nuevosDatos.stock !== undefined)
+                producto.stock = nuevosDatos.stock;
+
+            if (nuevosDatos.promocion !== undefined)
+                producto.promocion = nuevosDatos.promocion;
+
+            resolve(
+                ` Producto ${id} actualizado`
+            );
+
+        }, 2000);
+
+    });
 }
+
 
 export function eliminarProductoCocina(id) {
-    const producto = buscarIdCocina(id);
-    if (!producto) {
-        console.log(`Producto con ID ${id} no encontrado`);
-        return false;
-    }
-    producto.estado = "eliminado";
-    console.log(`Producto "${producto.nombre}" eliminado`);
-    return true;
+
+    return new Promise((resolve, reject) => {
+
+        console.log("\n Eliminando producto...");
+
+        setTimeout(() => {
+
+            const producto = buscarIdCocina(id);
+
+            if (!producto) {
+
+                reject(" Producto no encontrado");
+                return;
+            }
+
+            producto.estado = "eliminado";
+
+            resolve(
+                ` Producto "${producto.nombre}" eliminado`
+            );
+
+        }, 2000);
+
+    });
 }
 
-export function listarProductosCocina() {
-    console.log("\n====== LISTA DE PRODUCTOS ACTIVOS ======\n");
-    const activos = productosCocina.filter(p => p.estado === "activo");
-    mostrarCocina(activos);
-    return activos;
+
+
+export function prepararPedido(nombreProducto) {
+
+    return new Promise((resolve, reject) => {
+
+        console.log("\n Cocina preparando pedido...");
+
+        setTimeout(() => {
+
+            const producto = buscarNombreCocina(
+                nombreProducto
+            );
+
+            // PRODUCTO NO EXISTE
+            if (!producto) {
+
+                reject(
+                    "Error: producto inexistente"
+                );
+
+                return;
+            }
+
+            // PRODUCTO ELIMINADO
+            if (producto.estado !== "activo") {
+
+                reject(
+                    " Producto no disponible"
+                );
+
+                return;
+            }
+
+            // SIN STOCK
+            if (producto.stock <= 0) {
+
+                reject(
+                    " Ingredientes agotados"
+                );
+
+                return;
+            }
+
+            // SIMULACION DE MUCHOS PEDIDOS
+            const cocinaOcupada =
+                Math.random() < 0.3;
+
+            if (cocinaOcupada) {
+
+                reject(
+                    " Cocina saturada"
+                );
+
+                return;
+            }
+
+            // DESCONTAR STOCK
+            producto.stock--;
+
+            resolve(
+                ` Pedido listo: ${producto.nombre}
+            | Stock restante: ${producto.stock}`
+            );
+
+        }, 3000);
+
+    });
 }

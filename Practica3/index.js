@@ -4,9 +4,45 @@ import * as cliente from "./cliente.js";
 import * as caja from "./caja.js";
 import * as cocina from "./cocina.js";
 
-const productos = [];
 
-const pedidos = [];
+let productos = [
+
+    {
+        id: 1,
+        nombre: "Cafe Americano",
+        precio: 35,
+        categoria: "bebida",
+        estado: "activo",
+        stock: 10,
+        promocion: false
+    },
+
+    {
+        id: 2,
+        nombre: "Cappuccino",
+        precio: 55,
+        categoria: "bebida",
+        estado: "activo",
+        stock: 8,
+        promocion: true
+    },
+
+    {
+        id: 3,
+        nombre: "Te Verde",
+        precio: 30,
+        categoria: "bebida",
+        estado: "activo",
+        stock: 0,
+        promocion: false
+    }
+];
+
+let pedidos = [];
+
+
+
+
 
 cliente.inicializarCliente(productos, pedidos);
 

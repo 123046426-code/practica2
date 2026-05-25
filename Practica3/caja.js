@@ -45,9 +45,6 @@ function actualizarTotalCaja() {
     }, 0);
 }
 
-export function agregarPedidoCaja(mesa, items, notas = "") {
-    if(!mesa || !items || items.length === 0) {
-        console.log("Error: Mesa y items son requeridos");
 export async function agregarPedidoCaja(
     mesa,
     items,

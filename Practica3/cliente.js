@@ -68,7 +68,7 @@ export async function hacerPedidoCliente(idProducto) {
     const idNumerico = parseInt(idProducto);
 
     console.log(
-        `\n🛒 Cliente realizando pedido...`
+        `\nCliente realizando pedido...`
     );
 
     let productoEncontrado = null;

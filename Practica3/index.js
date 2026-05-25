@@ -1,12 +1,9 @@
 import readline from "readline";
-
 import * as cliente from "./cliente.js";
 import * as caja from "./caja.js";
 import * as cocina from "./cocina.js";
 
-
 let productos = [
-
     {
         id: 1,
         nombre: "Cafe Americano",
@@ -16,7 +13,6 @@ let productos = [
         stock: 10,
         promocion: false
     },
-
     {
         id: 2,
         nombre: "Cappuccino",
@@ -26,7 +22,6 @@ let productos = [
         stock: 8,
         promocion: true
     },
-
     {
         id: 3,
         nombre: "Te Verde",
@@ -40,14 +35,8 @@ let productos = [
 
 let pedidos = [];
 
-
-
-
-
 cliente.inicializarCliente(productos, pedidos);
-
 cocina.inicializarCocina(productos);
-
 caja.inicializarCaja(pedidos, productos);
 
 const rl = readline.createInterface({
@@ -63,20 +52,16 @@ function menuPrincipal() {
     console.log("4. Salir");
 
     rl.question("\nOpcion: ", function(op) {
-        if(op === "1") {
+        if (op === "1") {
             menuCliente();
-        }
-        else if(op === "2") {
+        } else if (op === "2") {
             menuCaja();
-        }
-        else if(op === "3") {
+        } else if (op === "3") {
             menuCocina();
-        }
-        else if(op === "4") {
+        } else if (op === "4") {
             console.log("Saliendo...");
             rl.close();
-        }
-        else {
+        } else {
             console.log("Opcion invalida");
             menuPrincipal();
         }
@@ -86,28 +71,23 @@ function menuPrincipal() {
 function menuCliente() {
     cliente.mostrarMenuCliente();
     rl.question("\nOpcion: ", function(op) {
-        if(op === "1") {
+        if (op === "1") {
             cliente.verProductosCliente();
             menuCliente();
-        }
-        else if(op === "2") {
+        } else if (op === "2") {
             rl.question("ID Producto: ", function(id) {
                 cliente.hacerPedidoCliente(id);
                 menuCliente();
             });
-        }
-        else if(op === "3") {
+        } else if (op === "3") {
             cliente.verPedidosCliente();
             menuCliente();
-        }
-        else if(op === "4") {
+        } else if (op === "4") {
             cliente.verPromocionesCliente();
             menuCliente();
-        }
-        else if(op === "5") {
+        } else if (op === "5") {
             menuPrincipal();
-        }
-        else {
+        } else {
             console.log("Opcion invalida");
             menuCliente();
         }
@@ -115,52 +95,33 @@ function menuCliente() {
 }
 
 function menuCaja() {
-    caja.mostrarMenuCaja();
-    rl.question("\nOpcion: ", function(op) {
-        if(op === "1") {
-            caja.verPedidosCaja();
-            menuCaja();
-        }
-        else if(op === "2") {
-            caja.verPedidosPorEstadoCaja("pendiente");
-            menuCaja();
-        }
-        else if(op === "3") {
-            caja.verPedidosPorEstadoCaja("en-preparacion");
-            menuCaja();
-        }
-        else if(op === "4") {
-            caja.verPedidosPorEstadoCaja("listo");
-            menuCaja();
-        }
-        else if(op === "5") {
-            rl.question("ID del pedido: ", function(id) {
-                rl.question("Nuevo estado (pendiente/en-preparacion/listo/cancelado): ", function(estado) {
-                    caja.cambiarEstadoPedidoCaja(parseInt(id), estado);
-                    menuCaja();
-                });
-            });
-        }
-        else if(op === "6") {
-            caja.mostrarResumenCaja();
-            menuCaja();
-        }
-        else if(op === "7") {
-            rl.question("Numero de mesa: ", function(mesa) {
-                rl.question("Items (separados por coma): ", function(itemsInput) {
-                    const items = itemsInput.split(",").map(i => i.trim());
-                    rl.question("Notas (opcional): ", function(notas) {
-                        caja.agregarPedidoCaja(mesa, items, notas);
+    caja.verPedidosCaja();
+
+    console.log("\n====== OPCIONES DE CAJA ======");
+    console.log("1. Cancelar un pedido");
+    console.log("2. Volver al menú principal");
+
+    rl.question("\nElige una opción: ", function(op) {
+        if (op === "1") {
+            rl.question("Ingresa el ID del pedido a cancelar: ", function(id) {
+                const idNum = parseInt(id);
+                caja.cancelarPedidoCaja(idNum, (error, resultado) => {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        console.log(resultado);
+                    }
+                    console.log("\n--- Lista actualizada ---");
+                    caja.verPedidosCaja();
+                    rl.question("\nPresiona Enter para continuar...", () => {
                         menuCaja();
                     });
                 });
             });
-        }
-        else if(op === "8") {
+        } else if (op === "2") {
             menuPrincipal();
-        }
-        else {
-            console.log("Opcion invalida");
+        } else {
+            console.log("Opción inválida");
             menuCaja();
         }
     });
@@ -169,47 +130,39 @@ function menuCaja() {
 function menuCocina() {
     cocina.mostrarMenuCocina();
     rl.question("\nOpcion: ", function(op) {
-        if(op === "1") {
+        if (op === "1") {
             cocina.verBaratosCocina();
             menuCocina();
-        }
-        else if(op === "2") {
+        } else if (op === "2") {
             cocina.verCarosCocina();
             menuCocina();
-        }
-        else if(op === "3") {
+        } else if (op === "3") {
             cocina.verBebidasCocina();
             menuCocina();
-        }
-        else if(op === "4") {
+        } else if (op === "4") {
             cocina.verPostresCocina();
             menuCocina();
-        }
-        else if(op === "5") {
+        } else if (op === "5") {
             rl.question("Nombre: ", function(nombre) {
                 const encontrado = cocina.buscarNombreCocina(nombre);
-                if(encontrado) {
+                if (encontrado) {
                     console.log(`${encontrado.nombre} - $${encontrado.precio}`);
-                }
-                else {
+                } else {
                     console.log("No encontrado");
                 }
                 menuCocina();
             });
-        }
-        else if(op === "6") {
+        } else if (op === "6") {
             rl.question("ID: ", function(id) {
                 const encontrado = cocina.buscarIdCocina(parseInt(id));
-                if(encontrado) {
+                if (encontrado) {
                     console.log(`${encontrado.nombre} - $${encontrado.precio}`);
-                }
-                else {
+                } else {
                     console.log("No encontrado");
                 }
                 menuCocina();
             });
-        }
-        else if(op === "7") {
+        } else if (op === "7") {
             rl.question("Nombre: ", function(nombre) {
                 rl.question("Precio: ", function(precio) {
                     rl.question("Categoria (bebida/postre/comida): ", function(categoria) {
@@ -223,11 +176,10 @@ function menuCocina() {
                     });
                 });
             });
-        }
-        else if(op === "8") {
+        } else if (op === "8") {
             rl.question("ID del producto a editar: ", function(id) {
                 const producto = cocina.buscarIdCocina(parseInt(id));
-                if(producto) {
+                if (producto) {
                     console.log(`Editando: ${producto.nombre} - $${producto.precio}`);
                     rl.question("Nuevo nombre (dejar vacio para no cambiar): ", function(nombre) {
                         rl.question("Nuevo precio (dejar vacio para no cambiar): ", function(precio) {
@@ -235,12 +187,12 @@ function menuCocina() {
                                 rl.question("Nuevo stock (dejar vacio para no cambiar): ", function(stock) {
                                     rl.question("Tiene promocion? (si/no/dejar vacio para no cambiar): ", function(promocionResp) {
                                         const nuevosDatos = {};
-                                        if(nombre) nuevosDatos.nombre = nombre;
-                                        if(precio) nuevosDatos.precio = parseFloat(precio);
-                                        if(categoria) nuevosDatos.categoria = categoria;
-                                        if(stock) nuevosDatos.stock = parseInt(stock);
-                                        if(promocionResp === "si") nuevosDatos.promocion = true;
-                                        if(promocionResp === "no") nuevosDatos.promocion = false;
+                                        if (nombre) nuevosDatos.nombre = nombre;
+                                        if (precio) nuevosDatos.precio = parseFloat(precio);
+                                        if (categoria) nuevosDatos.categoria = categoria;
+                                        if (stock) nuevosDatos.stock = parseInt(stock);
+                                        if (promocionResp === "si") nuevosDatos.promocion = true;
+                                        if (promocionResp === "no") nuevosDatos.promocion = false;
                                         cocina.editarProductoCocina(parseInt(id), nuevosDatos);
                                         menuCocina();
                                     });
@@ -253,21 +205,17 @@ function menuCocina() {
                     menuCocina();
                 }
             });
-        }
-        else if(op === "9") {
+        } else if (op === "9") {
             rl.question("ID del producto a eliminar: ", function(id) {
                 cocina.eliminarProductoCocina(parseInt(id));
                 menuCocina();
             });
-        }
-        else if(op === "10") {
+        } else if (op === "10") {
             cocina.listarProductosCocina();
             menuCocina();
-        }
-        else if(op === "11") {
+        } else if (op === "11") {
             menuPrincipal();
-        }
-        else {
+        } else {
             console.log("Opcion invalida");
             menuCocina();
         }

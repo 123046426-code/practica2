@@ -1,5 +1,3 @@
-import { prepararPedido } from "./cocina.js";
-
 let pedidosCaja = [];
 let totalAcumuladoCaja = 0;
 
@@ -28,396 +26,110 @@ const estadosPedidoCaja = {
     "cancelado": {
         etiqueta: "Cancelado",
         clase: "cancelado"
+    },
+    "preparado": {
+        etiqueta: "Preparado",
+        clase: "preparado"
     }
 };
 
 let productosCaja = [];
 
-export function inicializarCaja(
-    pedidosGlobal,
-    productosGlobal
-) {
-
+export function inicializarCaja(pedidosGlobal, productosGlobal) {
     pedidosCaja = pedidosGlobal;
     productosCaja = productosGlobal;
-
-    console.log(
-        "Modulo Caja inicializado"
-    );
+    console.log("Módulo Caja inicializado");
 }
 
 function actualizarTotalCaja() {
-
-    totalAcumuladoCaja =
-        pedidosCaja.reduce(
-            (acumulador, pedido) => {
-
-                return acumulador +
-                    pedido.total;
-
-            }, 0
-        );
-}
-
-export async function agregarPedidoCaja(
-    mesa,
-    items,
-    notas = ""
-) {
-
-    if (!mesa || !items || items.length === 0) {
-
-        console.log(
-            "Mesa y items requeridos"
-        );
-
-        return false;
-    }
-
-    const { ivaTasa } = configCaja;
-
-    const { siguienteIdPedido } =
-        estadoGlobalCaja;
-
-    // CALCULAR SUBTOTAL
-    const subtotal = items.reduce(
-        (acumulador, nombreItem) => {
-
-            const producto =
-                productosCaja.find(
-                    p =>
-                        p.nombre === nombreItem &&
-                        p.estado === "activo"
-                );
-
-            return acumulador +
-                (producto ? producto.precio : 0);
-
-        }, 0
+    totalAcumuladoCaja = pedidosCaja.reduce(
+        (acumulador, pedido) => acumulador + pedido.total,
+        0
     );
-
-    const iva = subtotal * ivaTasa;
-
-    const total = subtotal + iva;
-
-    const ahora = new Date();
-
-    const hora =
-        `${ahora.getHours()}:` +
-        `${String(
-            ahora.getMinutes()
-        ).padStart(2, "0")}`;
-
-    // CREAR PEDIDO
-    const nuevoPedido = {
-
-        id: siguienteIdPedido,
-
-        mesa: mesa,
-
-        items: [...items],
-
-        estado: "pendiente",
-
-        hora: hora,
-
-        notas: notas,
-
-        subtotal: subtotal,
-
-        iva: iva,
-
-        total: total
-    };
-
-    estadoGlobalCaja.siguienteIdPedido++;
-
-    pedidosCaja.unshift(nuevoPedido);
-
-    actualizarTotalCaja();
-
-    console.log(
-        `\nPedido #${nuevoPedido.id} generado`
-    );
-
-    try {
-
-        // CAMBIAR ESTADO
-        nuevoPedido.estado =
-            "en-preparacion";
-
-        console.log(
-            "\nCocina preparando pedido..."
-        );
-
-        // PREPARAR CADA PRODUCTO
-        for (const item of items) {
-
-            const respuesta =
-                await prepararPedido(item);
-
-            console.log(respuesta);
-        }
-
-        // PEDIDO LISTO
-        nuevoPedido.estado = "listo";
-
-        console.log(
-            "\n====== CLIENTE ======"
-        );
-
-        console.log(
-            `Pedido #${nuevoPedido.id} listo`
-        );
-
-        console.log(
-            `Total: ${configCaja.moneda}${total.toFixed(2)}`
-        );
-
-        return true;
-
-    } catch (error) {
-
-        nuevoPedido.estado =
-            "cancelado";
-
-        console.log(
-            "\n====== ERROR ======"
-        );
-
-        console.log(error);
-
-        return false;
-    }
 }
 
 export function verPedidosCaja() {
-
-    console.log(
-        "\n====== LISTA DE PEDIDOS ======\n"
-    );
+    console.log("\n====== LISTA DE TODOS LOS PEDIDOS ======\n");
 
     if (pedidosCaja.length === 0) {
-
-        console.log("No hay pedidos");
-
+        console.log("No hay pedidos registrados.");
         return;
     }
 
     pedidosCaja.forEach(pedido => {
-
-        const {
-            id,
-            mesa,
-            estado,
-            hora,
-            items,
-            subtotal,
-            iva,
-            total
-        } = pedido;
-
-        const info =
-            estadosPedidoCaja[estado];
-
+        const { id, mesa, estado, hora, items, subtotal, iva, total } = pedido;
+        const info = estadosPedidoCaja[estado];
         if (info) {
-
-            console.log(
-                `Pedido #${id} — ${mesa}`
-            );
-
-            console.log(
-                `Estado: ${info.etiqueta}`
-            );
-
-            console.log(
-                `Hora: ${hora}`
-            );
-
-            console.log(
-                `Items: ${items.join(" · ")}`
-            );
-
-            console.log(
-                `Subtotal: ${configCaja.moneda}${subtotal.toFixed(2)}`
-            );
-
-            console.log(
-                `IVA: ${configCaja.moneda}${iva.toFixed(2)}`
-            );
-
-            console.log(
-                `Total: ${configCaja.moneda}${total.toFixed(2)}`
-            );
-
+            console.log(`Pedido #${id} — ${mesa}`);
+            console.log(`Estado: ${info.etiqueta}`);
+            console.log(`Hora: ${hora}`);
+            console.log(`Items: ${items.join(" · ")}`);
+            console.log(`Subtotal: ${configCaja.moneda}${subtotal.toFixed(2)}`);
+            console.log(`IVA: ${configCaja.moneda}${iva.toFixed(2)}`);
+            console.log(`Total: ${configCaja.moneda}${total.toFixed(2)}`);
+            console.log("");
+        } else {
+            console.log(`Pedido #${id} — ${mesa} (estado desconocido: ${estado})`);
+            console.log(`Items: ${items.join(" · ")}`);
+            console.log(`Total: ${configCaja.moneda}${total.toFixed(2)}`);
             console.log("");
         }
     });
-}
-
-export function verPedidosPorEstadoCaja(
-    estado
-) {
-
-    console.log(
-        `\n====== PEDIDOS ${estado.toUpperCase()} ======\n`
-    );
-
-    const filtrados =
-        pedidosCaja.filter(
-            pedido =>
-                pedido.estado === estado
-        );
-
-    if (filtrados.length === 0) {
-
-        console.log(
-            `No hay pedidos en estado: ${estado}`
-        );
-
-        return;
-    }
-
-    filtrados.forEach(pedido => {
-
-        const {
-            id,
-            mesa,
-            total
-        } = pedido;
-
-        console.log(
-            `Pedido #${id} - ${mesa} - Total: ${configCaja.moneda}${total.toFixed(2)}`
-        );
-    });
-}
-
-export function cambiarEstadoPedidoCaja(
-    id,
-    nuevoEstado
-) {
-
-    const pedido =
-        pedidosCaja.find(
-            p => p.id === id
-        );
-
-    if (pedido) {
-
-        if (
-            estadosPedidoCaja[nuevoEstado]
-        ) {
-
-            pedido.estado =
-                nuevoEstado;
-
-            console.log(
-                `Pedido #${id}: ${estadosPedidoCaja[nuevoEstado].etiqueta}`
-            );
-
-            return true;
-
-        } else {
-
-            console.log(
-                `Estado ${nuevoEstado} no es valido`
-            );
-
-            return false;
-        }
-    }
-
-    console.log(
-        `Pedido #${id} no encontrado`
-    );
-
-    return false;
-}
-
-export function mostrarResumenCaja() {
-
-    console.log(
-        "\n====== RESUMEN CAJA ======\n"
-    );
 
     actualizarTotalCaja();
-
-    const pendientes =
-        pedidosCaja.filter(
-            p => p.estado === "pendiente"
-        ).length;
-
-    const preparacion =
-        pedidosCaja.filter(
-            p => p.estado === "en-preparacion"
-        ).length;
-
-    const listos =
-        pedidosCaja.filter(
-            p => p.estado === "listo"
-        ).length;
-
-    const cancelados =
-        pedidosCaja.filter(
-            p => p.estado === "cancelado"
-        ).length;
-
-    console.log(
-        `Pendientes: ${pendientes}`
-    );
-
-    console.log(
-        `En preparacion: ${preparacion}`
-    );
-
-    console.log(
-        `Listos: ${listos}`
-    );
-
-    console.log(
-        `Cancelados: ${cancelados}`
-    );
-
-    console.log(
-        `\nTotal acumulado: ${configCaja.moneda}${totalAcumuladoCaja.toFixed(2)}`
-    );
+    const totalPedidos = pedidosCaja.length;
+    console.log("====== RESUMEN DE CAJA ======");
+    console.log(`Total de pedidos: ${totalPedidos}`);
+    console.log(`Total acumulado: ${configCaja.moneda}${totalAcumuladoCaja.toFixed(2)}`);
 }
 
-export function mostrarMenuCaja() {
+// Función asíncrona con callback para cancelar un pedido
+export function cancelarPedidoCaja(id, callback) {
+    console.log(`\n Solicitando cancelación del pedido #${id}...`);
 
-    console.log(
-        "\n====== CAJA ======"
-    );
+    setTimeout(() => {
+        const pedido = pedidosCaja.find(p => p.id === id);
+        if (!pedido) {
+            callback(` Pedido #${id} no encontrado`, null);
+            return;
+        }
+        if (pedido.estado === "cancelado") {
+            callback(` El pedido #${id} ya estaba cancelado`, null);
+            return;
+        }
+        if (pedido.estado === "listo" || pedido.estado === "preparado") {
+            callback(` No se puede cancelar el pedido #${id} porque ya está ${pedido.estado}`, null);
+            return;
+        }
 
-    console.log(
-        "1. Ver todos los pedidos"
-    );
+        // Cambiar estado y actualizar total
+        pedido.estado = "cancelado";
+        actualizarTotalCaja();
 
-    console.log(
-        "2. Ver pedidos pendientes"
-    );
+        callback(null, ` Pedido #${id} cancelado correctamente`);
+    }, 2000); // simula proceso asíncrono de 2 segundos
+}
 
-    console.log(
-        "3. Ver pedidos en preparacion"
-    );
+// Función asíncrona con callback para marcar un pedido como listo (útil si quieres forzar desde caja)
+export function marcarPedidoListoCaja(id, callback) {
+    console.log(`\n Marcando pedido #${id} como listo...`);
 
-    console.log(
-        "4. Ver pedidos listos"
-    );
+    setTimeout(() => {
+        const pedido = pedidosCaja.find(p => p.id === id);
+        if (!pedido) {
+            callback(` Pedido #${id} no encontrado`, null);
+            return;
+        }
+        if (pedido.estado === "listo") {
+            callback(` El pedido #${id} ya estaba listo`, null);
+            return;
+        }
+        if (pedido.estado === "cancelado") {
+            callback(` No se puede marcar como listo un pedido cancelado`, null);
+            return;
+        }
 
-    console.log(
-        "5. Cambiar estado de pedido"
-    );
-
-    console.log(
-        "6. Ver resumen de caja"
-    );
-
-    console.log(
-        "7. Agregar pedido"
-    );
-
-    console.log(
-        "8. Salir"
-    );
+        pedido.estado = "listo";
+        callback(null, ` Pedido #${id} marcado como listo`);
+    }, 1500);
 }

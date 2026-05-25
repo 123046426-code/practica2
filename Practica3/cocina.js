@@ -62,7 +62,7 @@ function mostrarCocina(lista) {
 
     if (lista.length === 0) {
 
-        console.log("❌ No se encontraron productos");
+        console.log("No se encontraron productos");
         return;
     }
 
@@ -286,7 +286,7 @@ export function prepararPedido(nombreProducto) {
 
             // SIMULACION DE MUCHOS PEDIDOS
             const cocinaOcupada =
-                Math.random() < 0.3;
+                Math.random() < 0.2;
 
             if (cocinaOcupada) {
 
